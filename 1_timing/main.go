@@ -10,8 +10,14 @@ import (
 
 // MutliURLTimes calls URLTime for every URL in URLs.
 func MultiURLTime(urls []string) {
+	wg := sync.WaitGroup{}
+	wg.Add(len(urls))
+
 	for _, url := range urls {
-		URLTime(url)
+		go func(url string) {
+			defer wg.Done()
+			URLTime(url)
+		}(url)
 	}
 }
 
@@ -47,16 +53,6 @@ func main() {
 		"http://localhost:8080/100",
 		"http://localhost:8080/50",
 	}
-
-	wg := sync.WaitGroup{}
-	wg.Add(len(urls))
-	for _, url := range urls {
-		go func(url string) {
-			defer wg.Done()
-			URLTime(url)
-		}(url)
-	}
-	wg.Wait()
 
 	MultiURLTime(urls)
 
